@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         builder.setView(dialogLayout)
         builder.setPositiveButton("Connect") {
                 dialogInterface, i -> Toast.makeText(applicationContext, "EditText is " + username.text.toString(), Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, WaitingRoom::class.java)
+            val intent = Intent(this,GameActivity::class.java)
             startActivity(intent)
         }
         builder.show()
