@@ -1,14 +1,52 @@
 package com.example.dimspaceteam
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
+import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
+
+
+data class Avatar (
+    val id: Int,
+    val name: String,
+    val avatar: String,
+    var score: Int,
+    var state: State = State.OVER
+)
+
+enum class State(val value: Int) {
+    WAITING(0), READY(1), IN_GAME(2), OVER(3)
+}
+
+// class servant lors de la crétion d'un utilisateur
+data class AvatarPost(val name: String)
+
+
+
+interface Testatrix{
+
+    @GET("/api/users?sort=top")
+    fun getTanStops(): Call<List<Avatar>>
+
+    @POST("/api/user/register")
+    fun registerUser(@Body newUser: AvatarPost) : Call<Avatar>
+
+    @GET("/api/user/find/{name}")
+    fun Avatarname(@Path("name") name: String): Call<Avatar>
+}
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,6 +54,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         btStart.setOnClickListener{displayJoinModal()}
+
+
     }
     fun displayJoinModal(){
         val builder = AlertDialog.Builder(this)
@@ -31,5 +71,89 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         builder.show()
+
+
+        // Sert pour les connection en GET ou en POST
+        val tanUrl = "http://vps769278.ovh.net"
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(tanUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(Testatrix::class.java)
+
+
+        // obtenir liste de tous les users avec les meilleurs score
+        fun ListTopUser(){
+            val tanStops = service.getTanStops()
+            tanStops.enqueue(object: Callback<List<Avatar>> {
+                override fun onResponse(call: Call<List<Avatar>>?, response: Response<List<Avatar>>) {
+                    val allTanStop = response.body()
+                    allTanStop?.let {
+                        // On parcoure la liste
+                        for( tanStop in it) {
+                            ///////////////////////////
+                            // traitement des donnees
+                            ///////////////////////////
+                            Log.d("TAN","Arret Tan ${tanStop.name}")
+                        }
+                    }
+                }
+                override fun onFailure(call: Call<List<Avatar>>?, t: Throwable?) {
+                    // SI echec Est ce qu'on l'afficher un textview ?
+                }
+            })
+        }
+
+
+        // Obtenir information d'un user avec son nom
+        fun TestPerso(){
+            // variable de test
+            var testname= "jojo"
+
+
+            val tanStops = service.Avatarname("${testname}")
+            tanStops.enqueue(object: Callback<Avatar> {
+
+                override fun onResponse(call: Call<Avatar>?, response: Response<Avatar>) {
+                    val allTanStop = response.body()
+                    allTanStop?.let {
+                        ///////////////////////////
+                        // traitement des donnees
+                        ///////////////////////////
+                        Log.d("TAN","Arret Tan ${it.name}")
+                    }
+                }
+
+                override fun onFailure(call: Call<Avatar>?, t: Throwable?) {
+                    // SI l'utilisateur n'exsite pas je n'arrive pas a apeller la fonction RegistreUser()
+                }
+            })
+        }
+
+
+
+        // Ajouts d'un utilisateur passage du nom en variable
+        fun RegistrerUser( nameuser : String){
+            val user = AvatarPost("${nameuser}")
+            val tanStops = service.registerUser(user)
+
+            // obtenir info sur un joueur par son nom
+            tanStops.enqueue(object: Callback<Avatar> {
+
+                override fun onResponse(call: Call<Avatar>?, response: Response<Avatar>) {
+                    val allTanStop = response.body()
+                    allTanStop?.let {
+                        Log.d("TAN","Arret Tan ${it.name}")
+                    }
+                }
+                override fun onFailure(call: Call<Avatar>?, t: Throwable?) {
+                    Log.e("TAN", "Error : $t")
+                }
+            })
+        }
+
+
     }
 }
