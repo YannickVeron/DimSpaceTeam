@@ -19,20 +19,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 
-data class Avatar (
-    val id: Int,
-    val name: String,
-    val avatar: String,
-    var score: Int,
-    var state: State = State.OVER
-)
 
-enum class State(val value: Int) {
-    WAITING(0), READY(1), IN_GAME(2), OVER(3)
-}
-
-// class servant lors de la crétion d'un utilisateur
-data class AvatarPost(val name: String)
 
 
 
@@ -48,13 +35,38 @@ interface Testatrix{
     fun Avatarname(@Path("name") name: String): Call<Avatar>
 }
 
+
+data class Avatar (
+    val id: Int,
+    val name: String,
+    val avatar: String,
+    var score: Int,
+    var state: State = State.OVER
+)
+// class servant lors de la crétion d'un utilisateur
+data class AvatarPost(val name: String)
+
+
 class MainActivity : AppCompatActivity() {
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         btStart.setOnClickListener{displayJoinModal()}
 
+        /*
+        //recherche user
+        TestPerso()
+        // list user score top
+        ListTopUser()
+        // registre user
+        var testname= "test"
+        RegistrerUser(testname)
+        */
+         
 
     }
     fun displayJoinModal(){
@@ -71,7 +83,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         builder.show()
-
+    }
 
         // Sert pour les connection en GET ou en POST
         val tanUrl = "http://vps769278.ovh.net"
@@ -155,5 +167,5 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-    }
+
 }
