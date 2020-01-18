@@ -143,7 +143,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     // Ajouts d'un utilisateur passage du nom en variable
     fun registrerUser(username : String){
         val user = UserPost("${username}")
@@ -162,5 +161,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }*/
+
 
 }
