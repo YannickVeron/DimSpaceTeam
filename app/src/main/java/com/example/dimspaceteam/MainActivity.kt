@@ -4,21 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.dimspaceteam.model.User
+import com.example.dimspaceteam.model.UserPost
+import com.example.dimspaceteam.network.Api
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
 
-interface Testatrix{
+/*interface ApiService{
 
     @GET("/api/users?sort=top")
     fun getTopUsers(): Call<List<User>>
@@ -28,7 +24,7 @@ interface Testatrix{
 
     @GET("/api/user/find/{name}")
     fun getUser(@Path("name") name: String): Call<User>
-}
+}*/
 
 
 //Now Obsolete => Use "User" class
@@ -48,8 +44,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        btStart.setOnClickListener{displayJoinModal()}
-
+        var api = Api("http://vps769278.ovh.net")//put this in .env equivalent (global)
+        btStart.setOnClickListener{displayJoinModal(api)}
+        api.getTopUsers(object: Callback<List<User>> {
+            override fun onResponse(call: Call<List<User>>?, response: Response<List<User>>) {
+                response.body()?.let {users->
+                    var str =""
+                    for(user in users) {
+                        str="${str} ${user.score} : ${user.name}\n"
+                    }
+                    highScores.setText(str)
+                }
+            }
+            override fun onFailure(call: Call<List<User>>?, t: Throwable?) {
+                highScores.setText("Failed to retrieved highscores")
+            }
+        })
 
         /*
         //recherche user
@@ -61,51 +71,59 @@ class MainActivity : AppCompatActivity() {
         registrerUser(username)*/
     }
 
-    fun displayJoinModal(){
-        val dialog = AlertDialog.Builder(this)
-        val inflater = layoutInflater
-        dialog.setTitle("Login")
-        val dialogLayout = inflater.inflate(R.layout.dialog_join, null)
+    fun displayJoinModal(api: Api){
+        val dialogLayout = layoutInflater.inflate(R.layout.dialog_join, null)
         val username  = dialogLayout.findViewById<EditText>(R.id.username)
         val room = dialogLayout.findViewById<EditText>(R.id.room)
-        dialog.setView(dialogLayout)
-        dialog.setPositiveButton("Connect") {
-                dialogInterface, i -> Toast.makeText(applicationContext, "EditText is " + username.text.toString(), Toast.LENGTH_SHORT).show()
-            val intent = Intent(this,GameActivity::class.java)
-            startActivity(intent)
-        }
-        dialog.show()
+        AlertDialog.Builder(this).setTitle("Login")
+            .setView(dialogLayout)
+            .setPositiveButton("Connect") {
+                _,_ ->
+                var context = this
+                api.getUser(username.text.toString(),object: Callback<User> {//check if user exist
+                    override fun onResponse(call: Call<User>?, response: Response<User>) {
+                        response.body()?.also{user->
+                            Log.i("Login","${user.name} : ${user.id}")
+                            api.logUser(user.id,object: Callback<User>{//log in user
+                                override fun onResponse(call: Call<User>?, response: Response<User>?){
+                                    Log.i("Login","user successfully logged in")
+                                    val intent = Intent(context,GameActivity::class.java).apply {
+                                        putExtra("room_name",room.text.toString())
+                                    }
+                                    startActivity(intent)
+                                }
+                                override fun onFailure(call: Call<User>?, t: Throwable?) {
+                                    Log.i("Login","Failed to log user")
+                                }
+                            })
+                        }?:let{
+                            api.registerUser(UserPost(username.text.toString()),object: Callback<User>{//register user
+                                override fun onResponse(call: Call<User>?, response: Response<User>?) {
+                                    Log.i("Login","user successfully registered")
+                                }
+                                override fun onFailure(call: Call<User>?, t: Throwable?) {
+                                    Log.i("Login","Failed to register user")
+                                    TODO("Log user in ")
+                                }
+                            })
+                        }
+                    }
+                    override fun onFailure(call: Call<User>?, t: Throwable?) {
+                        Log.i("Login","Failed to find if user exist")
+                    }
+                })
+        }.show()
     }
 
     // Sert pour les connection en GET ou en POST
-    val apiUrl = "http://vps769278.ovh.net"
+    /*val apiUrl = "http://vps769278.ovh.net"
 
     val retrofit = Retrofit.Builder()
         .baseUrl(apiUrl)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val service = retrofit.create(Testatrix::class.java)
-
-
-    // obtenir liste de tous les users avec les meilleurs score
-    fun getTopUsers(){
-        val topUsersCall = service.getTopUsers()
-        topUsersCall.enqueue(object: Callback<List<User>> {
-            override fun onResponse(call: Call<List<User>>?, response: Response<List<User>>) {
-                val topUsers = response.body()
-                topUsers?.let {
-                    // On parcoure la liste
-                    for(user in it) {
-                        Log.d("Api","Top player : ${user.name}")
-                    }
-                }
-            }
-            override fun onFailure(call: Call<List<User>>?, t: Throwable?) {
-                // SI echec Est ce qu'on l'afficher un textview ?
-            }
-        })
-    }
+    val service = retrofit.create(ApiService::class.java)
 
     // Obtenir information d'un user avec son nom
     fun getUser(username: String){
@@ -143,6 +161,6 @@ class MainActivity : AppCompatActivity() {
                 Log.e("Api", "Error : $t")
             }
         })
-    }
+    }*/
 
 }

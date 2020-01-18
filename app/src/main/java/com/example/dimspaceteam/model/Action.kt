@@ -1,4 +1,6 @@
-package com.example.dimspaceteam
+package com.example.dimspaceteam.model
+
+import com.example.dimspaceteam.model.UIElement
 
 data class Action(
     val sentence: String,
