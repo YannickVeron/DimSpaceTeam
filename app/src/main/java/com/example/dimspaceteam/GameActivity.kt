@@ -12,10 +12,12 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 class GameActivity : FragmentActivity() {
     //Game activity will load waiting room fragment then question fragment
     var roomName:String? = null
+    var userId:Int?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.i("frag","room name ${intent.getStringExtra("room_name")}")
         roomName=intent.getStringExtra("room_name")
+        userId=intent.getIntExtra("user_id",0)
         setContentView(R.layout.game)
     }
 }

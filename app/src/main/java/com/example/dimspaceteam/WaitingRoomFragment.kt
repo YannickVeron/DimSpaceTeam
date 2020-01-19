@@ -9,7 +9,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import kotlinx.android.synthetic.main.waiting_room_fragment.*
+import com.example.dimspaceteam.network.WebSocketJoinRoom
 
 class WaitingRoomFragment : Fragment(){
     override fun onCreateView(
@@ -21,7 +21,10 @@ class WaitingRoomFragment : Fragment(){
         var startQuestionBtn = view.findViewById<Button>(R.id.btnStart)
         startQuestionBtn.setOnClickListener {Start(view)}
         var labelRoom = view.findViewById<TextView>(R.id.roomNameLb)
-        labelRoom.setText((activity as GameActivity).roomName)
+        var roomName=(activity as GameActivity).roomName
+        var userId =(activity as GameActivity).userId
+        labelRoom.setText(roomName)
+        WebSocketJoinRoom(roomName,userId)
         return view
     }
 

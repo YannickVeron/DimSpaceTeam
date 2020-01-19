@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             override fun onFailure(call: Call<List<User>>?, t: Throwable?) {
+                Log.e("Scores",t.toString())
                 highScores.setText("Failed to retrieved highscores")
             }
         })
@@ -89,6 +90,7 @@ class MainActivity : AppCompatActivity() {
                                     Log.i("Login","user successfully logged in")
                                     val intent = Intent(context,GameActivity::class.java).apply {
                                         putExtra("room_name",room.text.toString())
+                                        putExtra("user_id",user.id)
                                     }
                                     startActivity(intent)
                                 }
