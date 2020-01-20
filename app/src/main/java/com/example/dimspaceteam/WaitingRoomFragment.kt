@@ -15,12 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import com.example.dimspaceteam.model.*
-import com.example.dimspaceteam.network.EventHandler
-import com.github.nisrulz.sensey.Sensey
-import com.github.nisrulz.sensey.ShakeDetector.ShakeListener
-//import sun.jvm.hotspot.utilities.IntArray
-import androidx.lifecycle.ViewModelProviders
+import com.example.dimspaceteam.network.Client
 
 
 class WaitingRoomFragment : Fragment(){
@@ -39,6 +34,8 @@ class WaitingRoomFragment : Fragment(){
         var roomName=(activity as GameActivity).roomName
         var userId =(activity as GameActivity).userId
         labelRoom.setText(roomName)
+        Client.create("${roomName}", "${userId}")
+       // WebSocketJoinRoom(roomName,userId)
 
 
         //Test Events

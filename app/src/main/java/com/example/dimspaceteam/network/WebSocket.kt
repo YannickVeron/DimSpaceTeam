@@ -1,45 +1,88 @@
 package com.example.dimspaceteam.network
 
 import android.util.Log
+import com.example.dimspaceteam.model.Event
+import com.example.dimspaceteam.model.EventType
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.*
-import okio.ByteString
 
-private val socketUrl = "ws://vps769278.ovh.net:8081/ws/join/"
-private val TAG = "websocket"
 
-fun WebSocketJoinRoom(roomName: String?, userId: Int?) {
-    Log.d(TAG, "webSocket")
-    val client = OkHttpClient()
-    val requestJoinRoom = Request.Builder().url(socketUrl+"/"+roomName+"/"+userId).build()
+object ObjetParser{
 
-    val webSocketListenerJoinRoom = object : WebSocketListener() {
-        override fun onOpen(webSocket: WebSocket, response: Response) {
-            Log.d(TAG, "onOpen")
-        }
+    var eventParser: JsonAdapter<Event>? = null
 
-        override fun onMessage(webSocket: WebSocket?, text: String?) {
-            Log.d(TAG, "MESSAGE: " + text!!)
-        }
-
-        override fun onMessage(webSocket: WebSocket?, bytes: ByteString) {
-            Log.d(TAG, "MESSAGE: " + bytes.hex())
-        }
-
-        override fun onClosing(webSocket: WebSocket, code: Int, reason: String?) {
-            webSocket.close(1000, null)
-            webSocket.cancel()
-            Log.d(TAG, "CLOSE: $code $reason")
-        }
-
-        override fun onClosed(webSocket: WebSocket?, code: Int, reason: String?) {
-            //TODO: stuff
-        }
-
-        override  fun onFailure(webSocket: WebSocket, t: Throwable, response: Response) {
-            //TODO: stuff
+    private fun createInstance() {
+        if (eventParser == null) {
+            var moshi = Moshi.Builder()
+                .add(
+                    PolymorphicJsonAdapterFactory.of(Event::class.java, "type")
+                        .withSubtype(Event.Ready::class.java, EventType.READY.name)
+                        .withSubtype(Event.Error::class.java, EventType.ERROR.name)
+                        .withSubtype(Event.GameStarted::class.java, EventType.GAME_STARTED.name)
+                        .withSubtype(Event.NextLevel::class.java, EventType.NEXT_LEVEL.name)
+                        .withSubtype(Event.PlayerAction::class.java, EventType.PLAYER_ACTION.name)
+                        .withSubtype(Event.NextAction::class.java, EventType.NEXT_ACTION.name)
+                        .withSubtype(Event.WaitingForPlayer::class.java, EventType.WAITING_FOR_PLAYER.name)
+                        .withSubtype(Event.GameOver::class.java, EventType.GAME_OVER.name)
+                )
+                .add(KotlinJsonAdapterFactory())
+                .build()
+            eventParser = moshi.adapter(Event::class.java)
         }
     }
 
-    client.newWebSocket(requestJoinRoom, webSocketListenerJoinRoom)
-    client.dispatcher().executorService().shutdown()
+    fun request(text:String): Event? {
+        if(eventParser==null)
+        {
+            this.createInstance()
+        }
+        return eventParser?.fromJson(text)
+    }
+}
+
+
+object Client: WebSocketListener() {
+
+
+    var webSocket: WebSocket? = null
+
+
+    fun create( room: String , id : String) {
+
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url("ws://vps769278.ovh.net:8081/ws/join/${room}/${id}")
+            .build()
+
+        webSocket=OkHttpClient().newWebSocket(request, this)
+
+    }
+
+    override fun onOpen(webSocket: WebSocket, response: Response) {
+        Log.d("response","Votre socket es ouverte")
+        this.webSocket = webSocket
+    }
+
+    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+        Log.d("response","fail because : " + t.message)
+    }
+
+    override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+        webSocket.close(1000, null)
+        webSocket.cancel()
+        Log.d("response","socket close")
+    }
+
+    override fun onMessage(webSocket: WebSocket, text: String) {
+        Log.d("test", text)
+
+        var d=ObjetParser.request(text)
+
+        Log.d("toto","${d}")
+    }
+
+
 }
