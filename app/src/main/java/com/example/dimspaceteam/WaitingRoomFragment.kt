@@ -14,8 +14,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
+import com.example.dimspaceteam.model.Event
+import com.example.dimspaceteam.model.UIElement
+import com.example.dimspaceteam.model.UIType
 import com.example.dimspaceteam.network.Client
+import com.github.nisrulz.sensey.Sensey
+import com.github.nisrulz.sensey.ShakeDetector
 
 
 class WaitingRoomFragment : Fragment(){
@@ -140,7 +146,8 @@ class WaitingRoomFragment : Fragment(){
                     var shkLb = TextView(context)
                     shkLb.text=el.content
                     Sensey.getInstance().init(context)
-                    val shakeListener: ShakeListener = object : ShakeListener {
+                    val shakeListener: ShakeDetector.ShakeListener = object :
+                        ShakeDetector.ShakeListener {
                         override fun onShakeDetected() { // Shake detected, do something
                             Log.i("UI","Shake on ${el.content}")
                         }
