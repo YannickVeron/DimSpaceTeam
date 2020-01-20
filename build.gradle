@@ -6,6 +6,8 @@ buildscript {
         nav_version = '2.1.0'
         retrofit_version = '2.0.0'
         okhttp_version ='3.6.0'
+        moshi_version = '1.9.2'
+        sensey_version='1.8.0'
     }
 
     repositories {

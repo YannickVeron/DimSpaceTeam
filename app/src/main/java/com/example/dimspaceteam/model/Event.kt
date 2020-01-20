@@ -1,10 +1,15 @@
 package com.example.dimspaceteam.model
 
+import com.squareup.moshi.FromJson
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.ToJson
+
 enum class EventType() {
     GAME_STARTED(), GAME_OVER(), ERROR(), READY(), NEXT_ACTION(),
     NEXT_LEVEL(), WAITING_FOR_PLAYER(), PLAYER_ACTION()
 }
 
+@JsonClass(generateAdapter = true)
 sealed class Event(val type: EventType) {
     data class NextAction(val action: Action) : Event(
         EventType.NEXT_ACTION

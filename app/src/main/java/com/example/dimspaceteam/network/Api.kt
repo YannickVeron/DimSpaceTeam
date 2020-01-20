@@ -12,7 +12,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 
-interface ApiService2{
+interface ApiService{
 
     @POST("/api/user/register")
     fun registerUser(@Body newUser: UserPost) : Call<User>
@@ -51,17 +51,17 @@ class Api(url: String) {
     }
 
     companion object{
-        @Volatile private var SERVICE : ApiService2? = null
-        fun setInstance(url: String): ApiService2 =
+        @Volatile private var SERVICE : ApiService? = null
+        fun setInstance(url: String): ApiService =
             SERVICE ?: synchronized(this){
                 SERVICE?: buildApi(url).also{ SERVICE =it}
             }
-        private fun buildApi(url: String): ApiService2 {
+        private fun buildApi(url: String): ApiService {
             return Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
-                    .create(ApiService2::class.java)
+                    .create(ApiService::class.java)
         }
     }
 }
