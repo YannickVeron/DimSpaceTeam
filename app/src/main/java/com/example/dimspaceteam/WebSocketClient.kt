@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.dimspaceteam.model.Event
 import com.example.dimspaceteam.model.EventType
+import com.example.dimspaceteam.model.UIElement
+import com.example.dimspaceteam.model.UIType
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -30,6 +32,10 @@ object ObjetParser{
                         .withSubtype(Event.NextAction::class.java, EventType.NEXT_ACTION.name)
                         .withSubtype(Event.WaitingForPlayer::class.java, EventType.WAITING_FOR_PLAYER.name)
                         .withSubtype(Event.GameOver::class.java, EventType.GAME_OVER.name)
+                ).add(PolymorphicJsonAdapterFactory.of(UIElement::class.java,"type")
+                    .withSubtype(UIElement.Button::class.java, UIType.BUTTON.toString())
+                    .withSubtype(UIElement.Switch::class.java, UIType.SWITCH.toString())
+                    .withSubtype(UIElement.Shake::class.java, UIType.SHAKE.toString())
                 )
                 .add(KotlinJsonAdapterFactory())
                 .build()
@@ -85,7 +91,7 @@ object WebSocketClient: WebSocketListener() {
 
         var d=ObjetParser.request(text)
 
-        event.value = d
+        event.postValue(d)
 
         Log.d("toto","${d}")
 

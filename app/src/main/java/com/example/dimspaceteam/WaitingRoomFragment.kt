@@ -12,9 +12,12 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import com.example.dimspaceteam.model.Event
+import com.example.dimspaceteam.model.EventType
 import com.example.dimspaceteam.model.UIElement
 import com.example.dimspaceteam.model.UIType
 import com.github.nisrulz.sensey.Sensey
@@ -31,13 +34,13 @@ class WaitingRoomFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View? {
         var view = inflater.inflate(R.layout.waiting_room_fragment,container,false);
-        var startQuestionBtn = view.findViewById<Button>(R.id.btnStart)
-        startQuestionBtn.setOnClickListener {Start(view)}
+        var readyBtn = view.findViewById<Button>(R.id.btnReady)
         var labelRoom = view.findViewById<TextView>(R.id.roomNameLb)
         var roomName=(activity as GameActivity).roomName
         var userId =(activity as GameActivity).userId
         labelRoom.setText(roomName)
         WebSocketClient.create("${roomName}", "${userId}")
+        readyBtn.setOnClickListener {ready(view,WebSocketClient)}
 
 
 
@@ -55,20 +58,29 @@ class WaitingRoomFragment : Fragment(){
         eh.view = view
         eh.Handle(eventGS)
         //WebSocketJoinRoom(roomName,userId)*/
-        viewModel = ViewModelProviders.of(this).get(EventViewModel::class.java)
-        viewModel.getCurrentEvent().observe(this, Observer{event ->
 
-            /*when(event) {
-
-                is Event.GameStarted -> {
-
-                    updateUI()
-
+        val factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return EventViewModel(WebSocketClient) as T
+            }
+        }
+        viewModel = ViewModelProviders.of(this,factory).get(EventViewModel::class.java)
+        viewModel.getCurrentEvent().observe(this, Observer{e ->
+            when(e.type){
+                EventType.WAITING_FOR_PLAYER->{
+                    var users = (e as Event.WaitingForPlayer).userList
+                    var list=""
+                    for(user in users){
+                        list="${list} ${user.name} : ${user.state}\n"
+                    }
+                    view.findViewById<TextView>(R.id.playersList).text=list
+                    Log.i("Waiting",list)
                 }
-
-            }*/
-
-
+                EventType.GAME_STARTED->{
+                    view?.findNavController()?.navigate(R.id.questionFragment)
+                }
+                else->{}
+            }
         })
         viewModel.action.observe(this, Observer<Event.NextAction>{
 
@@ -81,8 +93,10 @@ class WaitingRoomFragment : Fragment(){
         Sensey.getInstance().stop()
     }
 
-    fun Start(view: View?){
-        view?.findNavController()?.navigate(R.id.questionFragment)
+    fun ready(view: View?,webSocketClient: WebSocketClient){
+        webSocketClient.webSocket?.send("{\"type\":\"READY\", \"value\":true}")
+        //view?.findNavController()?.navigate(R.id.questionFragment)
+        //TODO("Send ready")
     }
 
 
