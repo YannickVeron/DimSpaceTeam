@@ -8,8 +8,16 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="331dp"
+        android:layout_height="269dp"
         tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+    <TextView
+        android:id="@+id/actionLb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textSize="28sp"
+        android:textStyle="bold" />
 
     <ProgressBar
         android:id="@+id/progressBar"

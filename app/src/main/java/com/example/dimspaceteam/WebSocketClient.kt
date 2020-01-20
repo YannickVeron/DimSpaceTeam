@@ -43,12 +43,18 @@ object ObjetParser{
         }
     }
 
-    fun request(text:String): Event? {
-        if(eventParser==null)
-        {
+    fun fromJson(text:String): Event? {
+        if(eventParser==null) {
             this.createInstance()
         }
         return eventParser?.fromJson(text)
+    }
+
+    fun toJson(event:Event):String?{
+        if(eventParser==null) {
+            this.createInstance()
+        }
+        return eventParser?.toJson(event)
     }
 }
 
@@ -89,7 +95,7 @@ object WebSocketClient: WebSocketListener() {
     override fun onMessage(webSocket: WebSocket, text: String) {
         Log.d("test", text)
 
-        var d=ObjetParser.request(text)
+        var d=ObjetParser.fromJson(text)
 
         event.postValue(d)
 
