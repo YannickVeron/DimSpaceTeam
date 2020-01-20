@@ -1,5 +1,6 @@
 package com.example.dimspaceteam
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -61,15 +62,6 @@ class MainActivity : AppCompatActivity() {
                 highScores.setText("Failed to retrieved highscores")
             }
         })
-
-        /*
-        //recherche user
-        getUser("jojo")
-        // list user score top
-        getTopUsers()
-        // registre user
-        var username= "test"
-        registrerUser(username)*/
     }
 
     fun displayJoinModal(api: Api){
@@ -79,42 +71,56 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this).setTitle("Login")
             .setView(dialogLayout)
             .setPositiveButton("Connect") {
-                _,_ ->
+                    _,_ ->
                 var context = this
                 api.getUser(username.text.toString(),object: Callback<User> {//check if user exist
-                    override fun onResponse(call: Call<User>?, response: Response<User>) {
-                        response.body()?.also{user->
-                            Log.i("Login","${user.name} : ${user.id}")
-                            api.logUser(user.id,object: Callback<User>{//log in user
-                                override fun onResponse(call: Call<User>?, response: Response<User>?){
-                                    Log.i("Login","user successfully logged in")
-                                    val intent = Intent(context,GameActivity::class.java).apply {
-                                        putExtra("room_name",room.text.toString())
-                                        putExtra("user_id",user.id)
-                                    }
-                                    startActivity(intent)
-                                }
-                                override fun onFailure(call: Call<User>?, t: Throwable?) {
-                                    Log.i("Login","Failed to log user")
-                                }
-                            })
-                        }?:let{
-                            api.registerUser(UserPost(username.text.toString()),object: Callback<User>{//register user
-                                override fun onResponse(call: Call<User>?, response: Response<User>?) {
-                                    Log.i("Login","user successfully registered")
-                                }
-                                override fun onFailure(call: Call<User>?, t: Throwable?) {
-                                    Log.i("Login","Failed to register user")
-                                    TODO("Log user in ")
-                                }
-                            })
-                        }
+                override fun onResponse(call: Call<User>?, response: Response<User>) {
+                    response.body()?.also{user->
+                        Log.i("Login","${user.name} : ${user.id}")
+                        logUser(api,user,context,room.text.toString())
+                    }?:let{
+                        registerUser(api,username.text.toString(),context,room.text.toString())
                     }
+                }
                     override fun onFailure(call: Call<User>?, t: Throwable?) {
                         Log.i("Login","Failed to find if user exist")
                     }
                 })
-        }.show()
+            }.show()
+    }
+
+    fun logUser(api: Api, user: User, context: Context, roomName: String){
+        api.logUser(user.id,object: Callback<User>{//log in user
+        override fun onResponse(call: Call<User>?, response: Response<User>?){
+            Log.i("Login","user successfully logged in")
+            val intent = Intent(context,GameActivity::class.java).apply {
+                putExtra("room_name",roomName)
+                putExtra("user_id",user.id)
+            }
+            startActivity(intent)
+        }
+            override fun onFailure(call: Call<User>?, t: Throwable?) {
+                Log.e("Login","Failed to log user")
+            }
+        })
+    }
+
+    fun registerUser(api: Api, username:String, context: Context, roomName: String){
+        api.registerUser(UserPost(username),object: Callback<User>{//register user
+        override fun onResponse(call: Call<User>?, response: Response<User>) {
+            Log.i("Login","user successfully registered")
+            response.body()?.also{user->
+                Log.i("Login","${user.name} : ${user.id}")
+                logUser(api,user,context,roomName)
+            }?:let{
+                Log.e("Login","Failed to register user : emptyResponse")
+            }
+        }
+            override fun onFailure(call: Call<User>?, t: Throwable?) {
+                Log.e("Login","Failed to register user : fail request")
+
+            }
+        })
     }
 
     // Sert pour les connection en GET ou en POST
