@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
     app:startDestination="@id/waitingRoomFragment">
 
     <fragment
@@ -14,5 +16,22 @@
     <fragment
         android:id="@+id/questionFragment"
         android:name="com.example.dimspaceteam.QuestionFragment"
-        android:label="QuestionFragment" />
+        android:label="QuestionFragment" >
+        <action
+            android:id="@+id/action_questionFragment_to_gameWin"
+            app:destination="@id/gameWin" />
+        <action
+            android:id="@+id/action_questionFragment_to_gameOver"
+            app:destination="@id/gameOver" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameOver"
+        android:name="com.example.dimspaceteam.GameOver"
+        android:label="fragment_game_over"
+        tools:layout="@layout/fragment_game_over" />
+    <fragment
+        android:id="@+id/gameWin"
+        android:name="com.example.dimspaceteam.GameWin"
+        android:label="fragment_game_win"
+        tools:layout="@layout/fragment_game_win" />
 </navigation>
