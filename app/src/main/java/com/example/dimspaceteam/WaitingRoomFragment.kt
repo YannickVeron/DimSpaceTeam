@@ -9,7 +9,8 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import com.example.dimspaceteam.network.WebSocketJoinRoom
+import com.example.dimspaceteam.network.Client
+
 
 class WaitingRoomFragment : Fragment(){
     override fun onCreateView(
@@ -24,7 +25,8 @@ class WaitingRoomFragment : Fragment(){
         var roomName=(activity as GameActivity).roomName
         var userId =(activity as GameActivity).userId
         labelRoom.setText(roomName)
-        WebSocketJoinRoom(roomName,userId)
+        Client.create("${roomName}", "${userId}")
+       // WebSocketJoinRoom(roomName,userId)
         return view
     }
 
