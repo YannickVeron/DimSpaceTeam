@@ -35,7 +35,7 @@ class EventViewModel(val webSocketClient: WebSocketClient) : ViewModel() {
                 EventType.READY->{/*TODO("Send event ready")*/}
                 EventType.PLAYER_ACTION->{/*TODO("Send action")*/
 
-                    webSocketClient.webSocket.send("")
+                  //  webSocketClient.webSocket.send("")
 
                 }//Should not exist
                 //IN/OUT

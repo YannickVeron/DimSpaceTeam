@@ -12,14 +12,11 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import com.example.dimspaceteam.model.Event
 import com.example.dimspaceteam.model.UIElement
 import com.example.dimspaceteam.model.UIType
-import com.example.dimspaceteam.network.Client
 import com.github.nisrulz.sensey.Sensey
 import com.github.nisrulz.sensey.ShakeDetector
 
@@ -40,8 +37,8 @@ class WaitingRoomFragment : Fragment(){
         var roomName=(activity as GameActivity).roomName
         var userId =(activity as GameActivity).userId
         labelRoom.setText(roomName)
-        Client.create("${roomName}", "${userId}")
-       // WebSocketJoinRoom(roomName,userId)
+        WebSocketClient.create("${roomName}", "${userId}")
+
 
 
         //Test Events
