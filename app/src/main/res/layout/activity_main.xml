@@ -19,6 +19,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.141" />
 
+    <TextView
+        android:id="@+id/textViewDescription"
+        android:layout_width="331dp"
+        android:layout_height="95dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:text="A bord de votre vaisseau avec votre équipage, vous devez suivre les instructions urgentes du tableau de bord pour distancer l'explosion d'une étoile!"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/btStart"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.521" />
+
     <Button
         android:id="@+id/btStart"
         android:layout_width="wrap_content"
