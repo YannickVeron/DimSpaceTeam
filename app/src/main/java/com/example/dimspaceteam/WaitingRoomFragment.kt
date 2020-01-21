@@ -64,7 +64,7 @@ class WaitingRoomFragment : Fragment(){
                 return EventViewModel(WebSocketClient) as T
             }
         }
-        viewModel = ViewModelProviders.of(this,factory).get(EventViewModel::class.java)
+        viewModel = ViewModelProviders.of(activity!!,factory).get(EventViewModel::class.java)
         viewModel.getCurrentEvent().observe(this, Observer{e ->
             when(e.type){
                 EventType.WAITING_FOR_PLAYER->{
@@ -77,13 +77,11 @@ class WaitingRoomFragment : Fragment(){
                     Log.i("Waiting",list)
                 }
                 EventType.GAME_STARTED->{
+                    viewModel?.gameStartedUI=(e as Event.GameStarted).uiElementList
                     view?.findNavController()?.navigate(R.id.questionFragment)
                 }
                 else->{}
             }
-        })
-        viewModel.action.observe(this, Observer<Event.NextAction>{
-
         })
         return view
     }

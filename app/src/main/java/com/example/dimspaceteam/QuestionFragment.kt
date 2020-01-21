@@ -3,14 +3,12 @@ package com.example.dimspaceteam
 import android.content.Context
 import android.graphics.Movie
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.Switch
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -34,6 +32,7 @@ import okhttp3.WebSocket
 class QuestionFragment : Fragment(){
 
     private lateinit var viewModel: EventViewModel
+    private lateinit var timer: CountDownTimer
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,20 +44,23 @@ class QuestionFragment : Fragment(){
                 return EventViewModel(WebSocketClient) as T
             }
         }
-        viewModel = ViewModelProviders.of(this,factory).get(EventViewModel::class.java)
+        var gameView = inflater.inflate(R.layout.question_fragment,container,false)
+        viewModel = ViewModelProviders.of(activity!!,factory).get(EventViewModel::class.java)
         viewModel.getCurrentEvent().observe(this, Observer{e ->handle(e)})
+        Log.i("quetion",viewModel.gameStartedUI.toString())
+        questionBuilder(context,gameView,viewModel.gameStartedUI)
         //handle(viewModel.getCurrentEvent().value!!)//initial handle
 
-        return inflater.inflate(R.layout.question_fragment,container,false)
+        return gameView
     }
 
     fun handle(event: Event){
         when(event.type){
-            EventType.GAME_STARTED->{
+            /*EventType.GAME_STARTED->{
                 Log.i("question","game started")
                 var uiElements = (event as Event.GameStarted).uiElementList
                 questionBuilder(context,view,uiElements)
-            }
+            }*/
             EventType.NEXT_ACTION->{displayAction(context,view,(event as Event.NextAction))}
             EventType.GAME_OVER->{
                 if((event as Event.GameOver).win) {
@@ -74,6 +76,18 @@ class QuestionFragment : Fragment(){
 
     fun displayAction(context: Context?,view: View?,nextAction: Event.NextAction){
         actionLb.text=nextAction.action.sentence
+        var progressBar=view?.findViewById<ProgressBar>(R.id.progressBar)
+        Log.i("progress",progressBar.toString())
+        progressBar?.max=nextAction.action.time.toInt()
+        progressBar?.progress=nextAction.action.time.toInt()
+        if(::timer.isInitialized){ timer.cancel() }
+        timer = object : CountDownTimer(nextAction.action.time, 20) {
+            override fun onTick(millisUntilFinished: Long) {
+                progressBar?.progress=millisUntilFinished.toInt()
+            }
+            override fun onFinish() {}
+        }
+        timer.start()
     }
 
     fun questionBuilder(context: Context?, view: View?, list: List<UIElement>){
@@ -83,30 +97,33 @@ class QuestionFragment : Fragment(){
         for(el in list){
             when(el.type){
                 UIType.BUTTON->{
-                    var bt = Button(context)
-                    bt.id=el.id
-                    bt.text=el.content
-                    bt.setOnClickListener{
-                        Log.i("UI","Click on ${bt.text}")
-                        var playerAction: String? = ObjetParser.toJson(Event.PlayerAction(el))
-                        WebSocketClient.webSocket?.send(playerAction)
+                    var button:Button = with(Button(context)) {
+                        id = el.id
+                        text=el.content
+                        setOnClickListener{
+                            Log.i("UI","Click on ${text}")
+                            var playerAction: String? = ObjetParser.toJson(Event.PlayerAction(el))
+                            WebSocketClient.webSocket?.send(playerAction)
+                        }
+                        this
                     }
-                    container?.addView(bt)
+                    container?.addView(button)
                 }
                 UIType.SWITCH->{
-                    var sw = Switch(context)
-                    sw.id=el.id
-                    sw.text=el.content
-                    sw.setOnClickListener{
-                        Log.i("UI","Click on ${sw.text}")
-                        var playerAction: String? = ObjetParser.toJson(Event.PlayerAction(el))
-                        WebSocketClient.webSocket?.send(playerAction)
+                    var switch:Switch = with(Switch(context)){
+                        id=el.id
+                        text=el.content
+                        setOnClickListener{
+                            Log.i("UI","Click on ${text}")
+                            var playerAction: String? = ObjetParser.toJson(Event.PlayerAction(el))
+                            WebSocketClient.webSocket?.send(playerAction)
+                        }
+                        this
                     }
-                    container?.addView(sw)
+                    container?.addView(switch)
+
                 }
                 UIType.SHAKE->{
-                    var shkLb = TextView(context)
-                    shkLb.text=el.content
                     Sensey.getInstance().init(context)
                     val shakeListener: ShakeDetector.ShakeListener = object :
                         ShakeDetector.ShakeListener {
@@ -115,11 +132,8 @@ class QuestionFragment : Fragment(){
                             var playerAction: String? = ObjetParser.toJson(Event.PlayerAction(el))
                             WebSocketClient.webSocket?.send(playerAction)
                         }
-                        override fun onShakeStopped() {
-
-                        }
+                        override fun onShakeStopped(){}
                     }
-                    container?.addView(shkLb)
                     Sensey.getInstance().startShakeDetection(shakeListener)
                 }
             }

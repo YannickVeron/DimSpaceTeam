@@ -12,6 +12,7 @@ import com.example.dimspaceteam.network.EventHandler
 class EventViewModel(val webSocketClient: WebSocketClient) : ViewModel() {
     var elements = MutableLiveData<List<UIElement>>()
     var action = MutableLiveData<Event.NextAction>()
+    lateinit var gameStartedUI : List<UIElement>
 
     fun getCurrentEvent():LiveData<Event> = webSocketClient.event
 
