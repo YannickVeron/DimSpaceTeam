@@ -9,7 +9,9 @@
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="269dp"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        android:contentDescription="Background"
+        app:srcCompat="@drawable/moon"
+        tools:srcCompat="@drawable/moon" />
 
     <TextView
         android:id="@+id/actionLb"
