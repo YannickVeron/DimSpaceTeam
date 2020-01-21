@@ -7,11 +7,10 @@ import androidx.lifecycle.ViewModel
 import com.example.dimspaceteam.model.Event
 import com.example.dimspaceteam.model.EventType
 import com.example.dimspaceteam.model.UIElement
-import com.example.dimspaceteam.network.EventHandler
+//import com.example.dimspaceteam.network.EventHandler
 
 class EventViewModel(val webSocketClient: WebSocketClient) : ViewModel() {
     var elements = MutableLiveData<List<UIElement>>()
-    var action = MutableLiveData<Event.NextAction>()
     lateinit var gameStartedUI : List<UIElement>
 
     fun getCurrentEvent():LiveData<Event> = webSocketClient.event
@@ -19,7 +18,7 @@ class EventViewModel(val webSocketClient: WebSocketClient) : ViewModel() {
 
 
 
-    fun handle(event: Event){
+    /*fun handle(event: Event){
         var context = EventHandler.view?.context
         Log.i("EventHandler",context.toString())
         event?.let { e->
@@ -46,6 +45,6 @@ class EventViewModel(val webSocketClient: WebSocketClient) : ViewModel() {
                 }
             }
         }
-    }
+    }*/
 
 }

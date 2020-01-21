@@ -46,21 +46,14 @@ class QuestionFragment : Fragment(){
         }
         var gameView = inflater.inflate(R.layout.question_fragment,container,false)
         viewModel = ViewModelProviders.of(activity!!,factory).get(EventViewModel::class.java)
-        viewModel.getCurrentEvent().observe(this, Observer{e ->handle(e)})
-        Log.i("quetion",viewModel.gameStartedUI.toString())
+        viewModel.getCurrentEvent().observe(this, Observer{e ->handleEvent(e)})
         questionBuilder(context,gameView,viewModel.gameStartedUI)
-        //handle(viewModel.getCurrentEvent().value!!)//initial handle
 
         return gameView
     }
 
-    fun handle(event: Event){
+    fun handleEvent(event: Event){
         when(event.type){
-            /*EventType.GAME_STARTED->{
-                Log.i("question","game started")
-                var uiElements = (event as Event.GameStarted).uiElementList
-                questionBuilder(context,view,uiElements)
-            }*/
             EventType.NEXT_ACTION->{displayAction(context,view,(event as Event.NextAction))}
             EventType.GAME_OVER->{
                 if((event as Event.GameOver).win) {

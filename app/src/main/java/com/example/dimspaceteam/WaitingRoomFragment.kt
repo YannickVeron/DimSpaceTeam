@@ -42,23 +42,6 @@ class WaitingRoomFragment : Fragment(){
         WebSocketClient.create("${roomName}", "${userId}")
         readyBtn.setOnClickListener {ready(view,WebSocketClient)}
 
-
-
-        //Test Events
-        /*var bt1 = UIElement.Button(1,"Some text")
-        var sw1 = UIElement.Switch(2,"SomeOtherText")
-        var sk1 = UIElement.Shake(3,"Shake Your Phone")
-        var lui : List<UIElement> = listOf(bt1,sw1,sk1)
-        var eventGS = Event.GameStarted(lui)
-        var eventNL = Event.NextLevel(lui,2)
-        var eventGO = Event.GameOver(250,true,3)
-
-        var eh = EventHandler
-        eh.fragment = this
-        eh.view = view
-        eh.Handle(eventGS)
-        //WebSocketJoinRoom(roomName,userId)*/
-
         val factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return EventViewModel(WebSocketClient) as T
@@ -93,39 +76,9 @@ class WaitingRoomFragment : Fragment(){
 
     fun ready(view: View?,webSocketClient: WebSocketClient){
         webSocketClient.webSocket?.send("{\"type\":\"READY\", \"value\":true}")
-        //view?.findNavController()?.navigate(R.id.questionFragment)
-        //TODO("Send ready")
     }
 
-
-    /*fun EventHandler(view: View,event: Event){
-        event?.let { e->
-            when(e.type){
-                //IN
-                EventType.WAITING_FOR_PLAYER->{/*TODO("Update waiting room player list")*/}
-                EventType.GAME_STARTED->{context?.let { questionBuilder(it,view,(e as Event.GameStarted).uiElementList)}}
-                EventType.NEXT_ACTION->{context?.let { displayAction(it,view,(e as Event.NextAction)) }}
-                EventType.GAME_OVER->{
-                    var eGO = (e as Event.GameOver)
-                    if(eGO.win){
-                        //TODO("Navigate to win Screen")
-                    }else{
-                        //TODO("Navigate to gameOver Screen")
-                    }
-                }
-                EventType.NEXT_LEVEL->{ context?.let { questionBuilder(it,view,(e as Event.NextLevel).uiElementList) } }
-                //OUT
-                EventType.READY->{/*TODO("Send event ready")*/}
-                EventType.PLAYER_ACTION->{/*TODO("Send action")*/}//Should not exist
-                //IN/OUT
-                EventType.ERROR->{
-                    Log.e("EventType","Something bad happened on the server")
-                    //TODO("Return to the main menu")
-                }
-            }
-        }
-    }*/
-    fun displayAction(context: Context,view: View,nextAction: Event.NextAction){
+    /*fun displayAction(context: Context,view: View,nextAction: Event.NextAction){
         //TODO("Display Question")
 
     }
@@ -169,6 +122,6 @@ class WaitingRoomFragment : Fragment(){
                 }
             }
         }
-    }
+    }*/
 }
 

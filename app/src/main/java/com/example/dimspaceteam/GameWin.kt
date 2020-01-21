@@ -48,7 +48,7 @@ class GameWin : Fragment() {
         }
         var view = inflater.inflate(R.layout.fragment_game_win,container,false)
 
-        viewModel = ViewModelProviders.of(this,factory).get(EventViewModel::class.java)
+        viewModel = ViewModelProviders.of(activity!!,factory).get(EventViewModel::class.java)
         viewModel.getCurrentEvent().observe(this, Observer{})
 
         view.findViewById<Button>(R.id.btnRestart).setOnClickListener{

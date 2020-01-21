@@ -49,8 +49,7 @@ class GameOver : Fragment(){
         }
         var view = inflater.inflate(R.layout.fragment_game_over,container,false)
 
-        viewModel = ViewModelProviders.of(this,factory).get(EventViewModel::class.java)
-        viewModel.getCurrentEvent().observe(this, Observer{})
+        viewModel = ViewModelProviders.of(activity!!,factory).get(EventViewModel::class.java)
 
         view.findViewById<Button>(R.id.btnRestart).setOnClickListener{
             view?.findNavController()?.navigate(R.id.waitingRoomFragment)

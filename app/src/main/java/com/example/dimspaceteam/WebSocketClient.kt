@@ -74,7 +74,6 @@ object WebSocketClient: WebSocketListener() {
             .build()
 
         webSocket=OkHttpClient().newWebSocket(request, this)
-
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -93,14 +92,10 @@ object WebSocketClient: WebSocketListener() {
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
-        Log.d("test", text)
+        Log.d("onMessage", text)
+        var message=ObjetParser.fromJson(text)
 
-        var d=ObjetParser.fromJson(text)
-
-        event.postValue(d)
-
-        Log.d("toto","${d}")
-
+        event.postValue(message)
 
     }
 
